@@ -5,191 +5,265 @@ import time
 
 
 def main():
-    # Paramètres
-    p = [1, 2, 3, 4, 5]
+
+    # ==========================================================
+    # PARAMÈTRES
+    # ==========================================================
+
+    p = [1, 2, 3, 4]
     a, b = 0, 1
+
     exact_integral = methode_integration.integrale_exacte(p, a, b)
 
-    # Valeurs de n (échelle logarithmique)
-    # On utilise des valeurs paires pour que Simpson fonctionne de manière optimale
-    n_values = np.array([10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 10000], dtype=int)
+    n_values = np.array([10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 10000])
 
-    # Stockage
-    errors_rectangle_classique = []
-    errors_rectangle_numpy = []
-    times_rectangle_classique = []
-    times_rectangle_numpy = []
+    # ==========================================================
+    # STOCKAGE
+    # ==========================================================
 
-    errors_trapeze_classique = []
-    errors_trapeze_numpy = []
-    times_trapeze_classique = []
-    times_trapeze_numpy = []
+    errors_rectangle_classique, errors_rectangle_numpy = [], []
+    errors_trapeze_classique, errors_trapeze_numpy = [], []
+    errors_simpson_classique, errors_simpson_numpy = [], []
+    errors_simpson_integree, errors_trapeze_integree = [], []
 
-    errors_simpson_classique = []
-    errors_simpson_numpy = []
-    times_simpson_classique = []
-    times_simpson_numpy = []
+    times_rectangle_classique, times_rectangle_numpy = [], []
+    times_trapeze_classique, times_trapeze_numpy = [], []
+    times_simpson_classique, times_simpson_numpy = [], []
+    times_simpson_integree, times_trapeze_integree = [], []
 
-    errors_simpson_integree = []
-    errors_trapeze_integree = []
-    times_simpson_integree = []
-    times_trapeze_integree = []
+    # ==========================================================
+    # CALCULS
+    # ==========================================================
 
     for n in n_values:
-        # Méthode rectangle classique
-        start_time = time.perf_counter()
-        approx_rectangle_classique = methode_integration.methode_rectangle_classique(p, a, b, n)
-        time_rectangle_classique = time.perf_counter() - start_time
-        error_rectangle_classique = abs(approx_rectangle_classique - exact_integral)
 
-        # Méthode rectangle NumPy
-        start_time = time.perf_counter()
-        approx_rectangle_numpy = methode_integration.methode_rectangle_numpy(p, a, b, n)
-        time_rectangle_numpy = time.perf_counter() - start_time
-        error_rectangle_numpy = abs(approx_rectangle_numpy - exact_integral)
+        # Rectangle classique
+        t0 = time.perf_counter()
+        rect_class = methode_integration.methode_rectangle_classique(p, a, b, n)
+        t_rect_class = time.perf_counter() - t0
 
-        # Méthode trapeze classique
-        start_time = time.perf_counter()
-        approx_trapeze_classique = methode_integration.methode_trapeze_classique(p, a, b, n)
-        time_trapeze_classique = time.perf_counter() - start_time
-        error_trapeze_classique = abs(approx_trapeze_classique - exact_integral)
+        # Rectangle NumPy
+        t0 = time.perf_counter()
+        rect_np = methode_integration.methode_rectangle_numpy(p, a, b, n)
+        t_rect_np = time.perf_counter() - t0
 
-        # Méthode trapeze numpy
-        start_time = time.perf_counter()
-        approx_trapeze_numpy = methode_integration.methode_trapeze_numpy(p, a, b, n)
-        time_trapeze_numpy = time.perf_counter() - start_time
-        error_trapeze_numpy = abs(approx_trapeze_numpy - exact_integral)
+        # Trapèze classique
+        t0 = time.perf_counter()
+        trap_class = methode_integration.methode_trapeze_classique(p, a, b, n)
+        t_trap_class = time.perf_counter() - t0
 
-        # Méthode simpson classique
-        start_time = time.perf_counter()
-        approx_simpson_classique = methode_integration.methode_simpson_classique(p, a, b, n)
-        time_simpson_classique = time.perf_counter() - start_time
-        error_simpson_classique = abs(approx_simpson_classique - exact_integral)
+        # Trapèze NumPy
+        t0 = time.perf_counter()
+        trap_np = methode_integration.methode_trapeze_numpy(p, a, b, n)
+        t_trap_np = time.perf_counter() - t0
 
-        # Méthode simpson numpy
-        start_time = time.perf_counter()
-        approx_simpson_numpy = methode_integration.methode_simpson_numpy(p, a, b, n)
-        time_simpson_numpy = time.perf_counter() - start_time
-        error_simpson_numpy = abs(approx_simpson_numpy - exact_integral)
+        # Simpson classique
+        t0 = time.perf_counter()
+        simp_class = methode_integration.methode_simpson_classique(p, a, b, n)
+        t_simp_class = time.perf_counter() - t0
 
-        # Méthode integree simpson (CORRIGÉ : Passage de n+1 arguments)
-        start_time = time.perf_counter()
-        approx_simpson_integree = methode_integration.methode_simpson_integree(p, a, b, n + 1)
-        time_simpson_integree_val = time.perf_counter() - start_time
-        error_simpson_integree_val = abs(approx_simpson_integree - exact_integral)
+        # Simpson NumPy
+        t0 = time.perf_counter()
+        simp_np = methode_integration.methode_simpson_numpy(p, a, b, n)
+        t_simp_np = time.perf_counter() - t0
 
-        # Méthode integree trapeze (CORRIGÉ : Passage de n+1 arguments)
-        start_time = time.perf_counter()
-        approx_trapeze_integree = methode_integration.methode_trapeze_integree(p, a, b, n + 1)
-        time_trapeze_integree_val = time.perf_counter() - start_time
-        error_trapeze_integree_val = abs(approx_trapeze_integree - exact_integral)
+        # Simpson intégré
+        t0 = time.perf_counter()
+        simp_int = methode_integration.methode_simpson_integree(p, a, b, n + 1)
+        t_simp_int = time.perf_counter() - t0
 
-        # Vérification de cohérence entre versions classiques et NumPy
-        assert np.isclose(approx_rectangle_classique, approx_rectangle_numpy, rtol=1e-10), \
-            f"Résultats divergents pour n={n} : {approx_rectangle_classique} vs {approx_rectangle_numpy}"
-        assert np.isclose(approx_trapeze_classique, approx_trapeze_numpy, rtol=1e-10), \
-            f"Résultats divergents pour n={n} : {approx_trapeze_classique} vs {approx_trapeze_numpy}"
-        assert np.isclose(approx_simpson_classique, approx_simpson_numpy, rtol=1e-10), \
-            f"Résultats divergents pour n={n} : {approx_simpson_classique} vs {approx_simpson_numpy}"
+        # Trapèze intégré
+        t0 = time.perf_counter()
+        trap_int = methode_integration.methode_trapeze_integree(p, a, b, n + 1)
+        t_trap_int = time.perf_counter() - t0
 
-        # Stockage des erreurs
-        errors_rectangle_classique.append(error_rectangle_classique)
-        errors_rectangle_numpy.append(error_rectangle_numpy)
-        errors_trapeze_classique.append(error_trapeze_classique)
-        errors_trapeze_numpy.append(error_trapeze_numpy)
-        errors_simpson_classique.append(error_simpson_classique)
-        errors_simpson_numpy.append(error_simpson_numpy)
-        errors_simpson_integree.append(error_simpson_integree_val)
-        errors_trapeze_integree.append(error_trapeze_integree_val)
+        # Vérifications
+        assert np.isclose(rect_class, rect_np, rtol=1e-10)
+        assert np.isclose(trap_class, trap_np, rtol=1e-10)
+        assert np.isclose(simp_class, simp_np, rtol=1e-10)
 
-        # Stockage des temps de calcul
-        times_rectangle_classique.append(time_rectangle_classique)
-        times_rectangle_numpy.append(time_rectangle_numpy)
-        times_trapeze_classique.append(time_trapeze_classique)
-        times_trapeze_numpy.append(time_trapeze_numpy)
-        times_simpson_classique.append(time_simpson_classique)
-        times_simpson_numpy.append(time_simpson_numpy)
-        times_simpson_integree.append(time_simpson_integree_val)
-        times_trapeze_integree.append(time_trapeze_integree_val)
+        # Erreurs
+        errors_rectangle_classique.append(abs(rect_class - exact_integral))
+        errors_rectangle_numpy.append(abs(rect_np - exact_integral))
 
-    # --- Graphiques ---
-    plt.figure(figsize=(12, 14))
-    plt.rcParams['font.family'] = 'Arial'
-    # 1. Convergence (erreur en fonction de n)
+        errors_trapeze_classique.append(abs(trap_class - exact_integral))
+        errors_trapeze_numpy.append(abs(trap_np - exact_integral))
+
+        errors_simpson_classique.append(abs(simp_class - exact_integral))
+        errors_simpson_numpy.append(abs(simp_np - exact_integral))
+
+        errors_simpson_integree.append(abs(simp_int - exact_integral))
+        errors_trapeze_integree.append(abs(trap_int - exact_integral))
+
+        # Temps
+        times_rectangle_classique.append(t_rect_class)
+        times_rectangle_numpy.append(t_rect_np)
+
+        times_trapeze_classique.append(t_trap_class)
+        times_trapeze_numpy.append(t_trap_np)
+
+        times_simpson_classique.append(t_simp_class)
+        times_simpson_numpy.append(t_simp_np)
+
+        times_simpson_integree.append(t_simp_int)
+        times_trapeze_integree.append(t_trap_int)
+
+    # ==========================================================
+    # STYLE
+    # ==========================================================
+
+    plt.style.use('ggplot')
+
+    # ==========================================================
+    # FIGURE 1
+    # ==========================================================
+
+    fig1 = plt.figure(figsize=(12, 14))
+
+    # ----------------------------------------------------------
+    # CONVERGENCE
+    # ----------------------------------------------------------
+
     plt.subplot(3, 1, 1)
+
     plt.loglog(n_values, errors_rectangle_classique, 'b-', label='Rectangle Classique', linewidth=2)
     plt.loglog(n_values, errors_rectangle_numpy, 'r--', label='Rectangle NumPy', linewidth=2)
+
     plt.loglog(n_values, errors_trapeze_classique, 'g-', label='Trapèze Classique', linewidth=2)
     plt.loglog(n_values, errors_trapeze_numpy, 'k--', label='Trapèze NumPy', linewidth=2)
+
     plt.loglog(n_values, errors_simpson_classique, 'c-', label='Simpson Classique', linewidth=2)
     plt.loglog(n_values, errors_simpson_numpy, 'm--', label='Simpson NumPy', linewidth=2)
+
     plt.loglog(n_values, errors_simpson_integree, color='darkred', linestyle='-', label='Simpson Intégrée', linewidth=2)
-    plt.loglog(n_values, errors_trapeze_integree, color='orange', linestyle='--', label='Trapeze Intégrée', linewidth=2)
+    plt.loglog(n_values, errors_trapeze_integree, color='orange', linestyle='--', label='Trapèze Intégrée', linewidth=2)
+
     plt.xlabel('Nombre de segments (n)')
     plt.ylabel('Erreur absolue')
-    plt.title('Convergence des méthodes d\'intégration')
+    plt.title("Convergence des méthodes d'intégration")
+
     plt.grid(True, which="both", ls="--", alpha=0.7)
     plt.legend()
 
-    # 2. Temps de calcul (temps en fonction de n)
+    # ----------------------------------------------------------
+    # TEMPS
+    # ----------------------------------------------------------
+
     plt.subplot(3, 1, 2)
+
     plt.loglog(n_values, times_rectangle_classique, 'b-', label='Rectangle Classique', linewidth=2)
     plt.loglog(n_values, times_rectangle_numpy, 'r--', label='Rectangle NumPy', linewidth=2)
+
     plt.loglog(n_values, times_trapeze_classique, 'g-', label='Trapèze Classique', linewidth=2)
     plt.loglog(n_values, times_trapeze_numpy, 'k--', label='Trapèze NumPy', linewidth=2)
+
     plt.loglog(n_values, times_simpson_classique, 'c-', label='Simpson Classique', linewidth=2)
     plt.loglog(n_values, times_simpson_numpy, 'm--', label='Simpson NumPy', linewidth=2)
+
     plt.loglog(n_values, times_simpson_integree, color='darkred', linestyle='-', label='Simpson Intégrée', linewidth=2)
-    plt.loglog(n_values, times_trapeze_integree, color='orange', linestyle='--', label='Trapeze Intégrée', linewidth=2)
+    plt.loglog(n_values, times_trapeze_integree, color='orange', linestyle='--', label='Trapèze Intégrée', linewidth=2)
+
     plt.xlabel('Nombre de segments (n)')
-    plt.ylabel('Temps de calcul (secondes)')
-    plt.title('Performance des méthodes d\'intégration')
+    plt.ylabel('Temps de calcul (s)')
+    plt.title("Performance des méthodes d'intégration")
+
     plt.grid(True, which="both", ls="--", alpha=0.7)
     plt.legend()
 
-    # 3. Erreur par méthode - Comparaison en barres
+    # ----------------------------------------------------------
+    # BARRES
+    # ----------------------------------------------------------
+
     plt.subplot(3, 1, 3)
+
     n_samples = [10, 50, 100, 500, 1000]
-    indices = [np.where(n_values == n)[0][0] for n in n_samples if n in n_values]
+    indices = [np.where(n_values == n)[0][0] for n in n_samples]
 
-    if indices:
-        x_pos = np.arange(len(indices))
-        width = 0.09
+    x_pos = np.arange(len(indices))
+    width = 0.09
 
-        errors_rect_class = [errors_rectangle_classique[i] for i in indices]
-        errors_rect_np = [errors_rectangle_numpy[i] for i in indices]
-        errors_trap_class = [errors_trapeze_classique[i] for i in indices]
-        errors_trap_np = [errors_trapeze_numpy[i] for i in indices]
-        errors_simpson_class = [errors_simpson_classique[i] for i in indices]
-        errors_simpson_np = [errors_simpson_numpy[i] for i in indices]
-        errors_simp_int = [errors_simpson_integree[i] for i in indices]
-        errors_trap_int = [errors_trapeze_integree[i] for i in indices]
+    plt.bar(x_pos - 3.5 * width, [errors_rectangle_classique[i] for i in indices], width, label='Rectangle Classique')
+    plt.bar(x_pos - 2.5 * width, [errors_rectangle_numpy[i] for i in indices], width, label='Rectangle NumPy')
 
-        # Répartition propre et symétrique des 8 barres autour de x_pos
-        plt.bar(x_pos - 3.5 * width, errors_rect_class, width, label='Rectangle Classique', color='tab:blue')
-        plt.bar(x_pos - 2.5 * width, errors_rect_np, width, label='Rectangle NumPy', color='tab:orange')
-        plt.bar(x_pos - 1.5 * width, errors_trap_class, width, label='Trapèze Classique', color='tab:green')
-        plt.bar(x_pos - 0.5 * width, errors_trap_np, width, label='Trapèze NumPy', color='tab:red')
-        plt.bar(x_pos + 0.5 * width, errors_simpson_class, width, label='Simpson Classique', color='tab:purple')
-        plt.bar(x_pos + 1.5 * width, errors_simpson_np, width, label='Simpson NumPy', color='tab:brown')
-        plt.bar(x_pos + 2.5 * width, errors_simp_int, width, label='Simpson Intégrée', color='darkred')
-        plt.bar(x_pos + 3.5 * width, errors_trap_int, width, label='Trapeze Intégrée', color='orange')
+    plt.bar(x_pos - 1.5 * width, [errors_trapeze_classique[i] for i in indices], width, label='Trapèze Classique')
+    plt.bar(x_pos - 0.5 * width, [errors_trapeze_numpy[i] for i in indices], width, label='Trapèze NumPy')
 
-        plt.yscale('log')
-        plt.xticks(x_pos, [n_values[i] for i in indices])
-        plt.xlabel('Nombre de segments (n)')
-        plt.ylabel('Erreur absolue (échelle log)')
-        plt.title('Comparaison des erreurs pour différentes valeurs de n')
-        plt.grid(True, axis='y', ls="--", alpha=0.7)
-        plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+    plt.bar(x_pos + 0.5 * width, [errors_simpson_classique[i] for i in indices], width, label='Simpson Classique')
+    plt.bar(x_pos + 1.5 * width, [errors_simpson_numpy[i] for i in indices], width, label='Simpson NumPy')
+
+    plt.bar(x_pos + 2.5 * width, [errors_simpson_integree[i] for i in indices], width, label='Simpson Intégrée')
+    plt.bar(x_pos + 3.5 * width, [errors_trapeze_integree[i] for i in indices], width, label='Trapèze Intégrée')
+
+    plt.yscale('log')
+
+    plt.xticks(x_pos, [n_values[i] for i in indices])
+
+    plt.xlabel('Nombre de segments (n)')
+    plt.ylabel('Erreur absolue')
+
+    plt.title('Comparaison des erreurs')
+
+    plt.grid(True, axis='y', ls='--', alpha=0.7)
+
+    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
 
     plt.tight_layout()
 
-    # EXPORTATION EN FORMAT PDF (Le fichier sera créé dans le même dossier que ton script)
-    plt.savefig('comparaison_integration_numerique.pdf', format='pdf', bbox_inches='tight')
+    # ==========================================================
+    # EXPORT FIGURE 1
+    # ==========================================================
+
+    fig1.savefig('comparaison_methodes_integration.pdf', format='pdf', bbox_inches='tight')
+
+    # ==========================================================
+    # FIGURE 2 : ZOOM SIMPSON
+    # ==========================================================
+
+    fig2 = plt.figure(figsize=(10, 6))
+
+    plt.loglog(n_values, errors_simpson_classique, 'o-c', label='Simpson Classique', linewidth=2, markersize=7)
+    plt.loglog(n_values, errors_simpson_numpy, 's-m', label='Simpson NumPy', linewidth=2, markersize=7)
+    plt.loglog(n_values, errors_simpson_integree, '^-', color='darkred', label='Simpson Intégrée', linewidth=2, markersize=7)
+
+    # Pente théorique
+    ref = errors_simpson_classique[0] * (n_values[0] ** 4)
+    theoretical = ref / (n_values ** 4)
+
+    plt.loglog(n_values, theoretical, 'k--', linewidth=2, label='Pente théorique $O(n^{-4})$')
+
+    # Précision machine
+    plt.axhline(y=np.finfo(float).eps, color='red', linestyle=':', linewidth=2, label='Précision machine')
+
+    # Limites axe Y
+    plt.ylim(1e-15, 1e-14)
+
+    plt.xlabel('Nombre de segments (n)', fontsize=12)
+    plt.ylabel('Erreur absolue', fontsize=12)
+
+    plt.title('Zoom sur la convergence de Simpson', fontsize=16, fontweight='bold')
+
+    plt.grid(True, which="both", linestyle='--', alpha=0.6)
+
+    plt.legend(fontsize=11)
+
+    plt.tight_layout()
+
+    # ==========================================================
+    # EXPORT FIGURE 2
+    # ==========================================================
+
+    fig2.savefig('zoom_convergence_simpson.pdf', format='pdf', bbox_inches='tight')
+
+    # ==========================================================
+    # AFFICHAGE
+    # ==========================================================
 
     plt.show()
 
+
+# ==============================================================
+# EXÉCUTION
+# ==============================================================
 
 if __name__ == "__main__":
     main()
