@@ -1,5 +1,5 @@
 import numpy as np
-
+from scipy.integrate import trapezoid, simpson
 
 def fonction_integrante(p: list, x):
     # p = [p0, p1, p2, p3, p4] -> p0 + p1*x + p2*x² + p3*x³ + p4*x⁴
@@ -80,5 +80,17 @@ def methode_simpson_numpy(p,a,b,n):
     s_m = 4*np.sum(f_m)
     somme_aires = (dx/6)*(somme_bords+s_m)
     return somme_aires
+
+def methode_trapeze_integree(p, a, b,n):
+    x = np.linspace(a, b, n) # 101 points pour avoir 100 intervalles
+    y = fonction_integrante(p, x)
+    return trapezoid(y, x=x) # On spécifie x=x ici
+
+def methode_simpson_integree(p, a, b, n):
+    x = np.linspace(a, b, n) # Nombre impair de points idéal pour Simpson
+    y = fonction_integrante(p, x)
+    return simpson(y, x=x) # On spécifie x=x ici
+
+
 
 
