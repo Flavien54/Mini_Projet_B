@@ -3,7 +3,7 @@ from scipy.integrate import trapezoid, simpson
 
 def fonction_integrante(p: list, x):
     # p = [p0, p1, p2, p3, p4] -> p0 + p1*x + p2*x² + p3*x³ + p4*x⁴
-    return p[0] + p[1] * x + p[2] * x ** 2 + p[3] * x ** 3 + p[4] * x ** 4
+    return p[0] + p[1] * x + p[2] * x ** 2 + p[3] * x ** 3
 
 
 def integrale_exacte(p, a, b):
@@ -11,8 +11,8 @@ def integrale_exacte(p, a, b):
     F = lambda x: (p[0] * x
                    + (p[1] * x ** 2) / 2
                    + (p[2] * x ** 3) / 3
-                   + (p[3] * x ** 4) / 4
-                   + (p[4] * x ** 5) / 5)
+                   + (p[3] * x ** 4) / 4)
+
     return F(b) - F(a)
 
 
