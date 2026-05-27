@@ -5,7 +5,7 @@ import time
 
 def main():
     # Paramètres
-    p = [1, 2, 3, 4]  # 1 + 2x + 3x² + 4x³
+    p = [1, 2, 3, 4, 5]
     a, b = 0, 1
     exact_integral = methode_integration.integrale_exacte(p, a, b)
 
@@ -17,10 +17,17 @@ def main():
     errors_rectangle_numpy = []
     times_rectangle_classique = []
     times_rectangle_numpy = []
+
     errors_trapeze_classique = []
     errors_trapeze_numpy = []
     times_trapeze_classique = []
     times_trapeze_numpy = []
+
+    errors_simpson_classique = []
+    errors_simpson_numpy = []
+    times_simpson_classique = []
+    times_simpson_numpy = []
+
 
     for n in n_values:
         # Méthode rectangle classique
@@ -47,11 +54,25 @@ def main():
         time_trapeze_numpy = time.perf_counter() - start_time
         error_trapeze_numpy = abs(approx_trapeze_numpy - exact_integral)
 
+        # Méthode simpson classique
+        start_time = time.perf_counter()
+        approx_simpson_classique = methode_integration.methode_simpson_classique(p, a, b, n)
+        time_simpson_classique = time.perf_counter() - start_time
+        error_simpson_classique = abs(approx_simpson_classique - exact_integral)
+
+        # Méthode simpson numpy
+        start_time = time.perf_counter()
+        approx_simpson_numpy = methode_integration.methode_simpson_numpy(p, a, b, n)
+        time_simpson_numpy = time.perf_counter() - start_time
+        error_simpson_numpy = abs(approx_simpson_numpy - exact_integral)
+
         # Vérification (les deux méthodes doivent donner le même résultat)
         assert np.isclose(approx_rectangle_classique, approx_rectangle_numpy, rtol=1e-10), \
             f"Résultats divergents pour n={n} : {approx_rectangle_classique} vs {approx_rectangle_numpy}"
         assert np.isclose(approx_trapeze_classique, approx_trapeze_numpy, rtol=1e-10), \
             f"Résultats divergents pour n={n} : {approx_trapeze_classique} vs {approx_trapeze_numpy}"
+        assert np.isclose(approx_simpson_classique, approx_simpson_numpy, rtol=1e-10), \
+            f"Résultats divergents pour n={n} : {approx_simpson_classique} vs {approx_simpson_numpy}"
 
         # Stockage
         errors_rectangle_classique.append(error_rectangle_classique)
@@ -64,6 +85,11 @@ def main():
         times_trapeze_classique.append(time_trapeze_classique)
         times_trapeze_numpy.append(time_trapeze_numpy)
 
+        errors_simpson_classique.append(error_simpson_classique)
+        errors_simpson_numpy.append(error_simpson_numpy)
+        times_simpson_classique.append(time_simpson_classique)
+        times_simpson_numpy.append(time_simpson_numpy)
+
     # --- Graphiques ---
     plt.figure(figsize=(12, 10))
 
@@ -73,6 +99,8 @@ def main():
     plt.loglog(n_values, errors_rectangle_numpy, 'r--', label='Rectangle NumPy', linewidth=2)
     plt.loglog(n_values, errors_trapeze_classique, 'g-', label='Trapèze Classique', linewidth=2)
     plt.loglog(n_values, errors_trapeze_numpy, 'k--', label='Trapèze NumPy', linewidth=2)
+    plt.loglog(n_values, errors_simpson_classique, 'c-', label='Simpson Classique', linewidth=2)
+    plt.loglog(n_values, errors_simpson_numpy, 'm--', label='Simpson NumPy', linewidth=2)
     plt.xlabel('Nombre de segments (n)')
     plt.ylabel('Erreur absolue')
     plt.title('Convergence des méthodes d\'intégration')
@@ -85,6 +113,8 @@ def main():
     plt.loglog(n_values, times_rectangle_numpy, 'r--', label='Rectangle NumPy', linewidth=2)
     plt.loglog(n_values, times_trapeze_classique, 'g-', label='Trapèze Classique', linewidth=2)
     plt.loglog(n_values, times_trapeze_numpy, 'k--', label='Trapèze NumPy', linewidth=2)
+    plt.loglog(n_values, times_simpson_classique, 'c-', label='Simpson Classique', linewidth=2)
+    plt.loglog(n_values, times_simpson_numpy, 'k--', label='Simpson NumPy', linewidth=2)
     plt.xlabel('Nombre de segments (n)')
     plt.ylabel('Temps de calcul (secondes)')
     plt.title('Performance des méthodes d\'intégration')
@@ -99,17 +129,23 @@ def main():
 
     if indices:  # Si les valeurs existent
         x_pos = np.arange(len(n_samples))
-        width = 0.2
+        # On réduit la largeur des barres pour que les 6 tiennent dans l'espace disponible
+        width = 0.12
 
         errors_rect_class = [errors_rectangle_classique[i] for i in indices]
         errors_rect_np = [errors_rectangle_numpy[i] for i in indices]
         errors_trap_class = [errors_trapeze_classique[i] for i in indices]
         errors_trap_np = [errors_trapeze_numpy[i] for i in indices]
+        errors_simpson_class = [errors_simpson_classique[i] for i in indices]
+        errors_simpson_np = [errors_simpson_numpy[i] for i in indices]
 
-        plt.bar(x_pos - 1.5 * width, errors_rect_class, width, label='Rectangle Classique')
-        plt.bar(x_pos - 0.5 * width, errors_rect_np, width, label='Rectangle NumPy')
-        plt.bar(x_pos + 0.5 * width, errors_trap_class, width, label='Trapèze Classique')
-        plt.bar(x_pos + 1.5 * width, errors_trap_np, width, label='Trapèze NumPy')
+        # On décale chaque barre d'une fraction de 'width' pour les aligner proprement
+        plt.bar(x_pos - 2.5 * width, errors_rect_class, width, label='Rectangle Classique', color='tab:blue')
+        plt.bar(x_pos - 1.5 * width, errors_rect_np, width, label='Rectangle NumPy', color='tab:orange')
+        plt.bar(x_pos - 0.5 * width, errors_trap_class, width, label='Trapèze Classique', color='tab:green')
+        plt.bar(x_pos + 0.5 * width, errors_trap_np, width, label='Trapèze NumPy', color='tab:red')
+        plt.bar(x_pos + 1.5 * width, errors_simpson_class, width, label='Simpson Classique', color='tab:purple')
+        plt.bar(x_pos + 2.5 * width, errors_simpson_np, width, label='Simpson NumPy', color='tab:brown')
 
         plt.yscale('log')
         plt.xticks(x_pos, n_samples)
@@ -118,21 +154,7 @@ def main():
         plt.title('Comparaison des erreurs pour différentes valeurs de n')
         plt.grid(True, axis='y', ls="--", alpha=0.7)
         plt.legend()
-    else:
-        # Alternative : courbes avec marqueurs pour distinguer
-        plt.loglog(n_values, errors_rectangle_classique, 'b-o', label='Rectangle Classique', markersize=4)
-        plt.loglog(n_values, errors_rectangle_numpy, 'r--s', label='Rectangle NumPy', markersize=4)
-        plt.loglog(n_values, errors_trapeze_classique, 'g-^', label='Trapèze Classique', markersize=4)
-        plt.loglog(n_values, errors_trapeze_numpy, 'k--d', label='Trapèze NumPy', markersize=4)
-        plt.xlabel('Nombre de segments (n)')
-        plt.ylabel('Erreur absolue')
-        plt.title('Comparaison des méthodes - zoom sur les différences')
-        plt.grid(True, which="both", ls="--", alpha=0.7)
-        plt.legend()
-
-    plt.tight_layout()
-    plt.savefig('analyse_integration.pdf', dpi=300)
-    plt.show()
+        plt.show()
 
 if __name__ == "__main__":
     main()
