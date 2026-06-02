@@ -10,7 +10,7 @@ def main():
     # PARAMÈTRES
     # ==========================================================
 
-    p = [1, 2, 3, 4]
+    p = [1e10, 2e-10, 3e-18, 4e5]
     a, b = 0, 1
 
     exact_integral = methode_integration.integrale_exacte(p, a, b)
