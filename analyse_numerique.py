@@ -1,3 +1,25 @@
+"""
+analyse_numerique.py
+====================
+L'objectif est de comparer la précision et le temps d'exécution de huit (8) variantes 
+d'intégration numérique appliquées au polynôme du 3e ordre défini dans le 2e fichier 
+methode_integration.py
+=====================
+
+Méthodes comparées : 
+--------------------
+    Rectangle - Python / Numpy
+    Trapèze   - Python / Numpy / Scipy (intégrée)
+    Simpson   - Python / Numpy / Scipy (intégrée)
+
+Sorties produites de l'execution : 
+----------------------------------
+    comparaison_methodes_integration.pdf - figure 1 : convergence, temps
+    zoom_convergence_simpson.pdf         - figure 2 : zoom sur Simpson
+
+"""
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 import methode_integration
@@ -9,22 +31,32 @@ def main():
     # ==========================================================
     # PARAMÈTRES
     # ==========================================================
+    # Coefficients du polynôme f(x) = p0 + p1·x + p2·x² + p3·x³
+    # Les valeurs ont des ordres de grandeur très différents pour rendre
+    # l'exercice numériquement non trivial.
 
     p = [1e10, 2e-10, 3e-18, 4e5]
-    a, b = 0, 1
 
+    # Bornes d'intégration
+    a, b = 0, 1
+    
+    # Valeur exacte calculée analytiquement — sert de référence pour l'erreur
     exact_integral = methode_integration.integrale_exacte(p, a, b)
 
+    # Série de valeurs de n (nombre de segments) à tester, espacées en log
+    # pour obtenir des graphiques log-log bien répartis
     n_values = np.array([10, 20, 50, 100, 200, 500, 1000, 2000, 4000, 10000])
 
     # ==========================================================
     # STOCKAGE
     # ==========================================================
-
+    # Listes d'erreurs absolues |I_numérique - I_exacte| pour chaque méthode
     errors_rectangle_classique, errors_rectangle_numpy = [], []
     errors_trapeze_classique, errors_trapeze_numpy = [], []
     errors_simpson_classique, errors_simpson_numpy = [], []
     errors_simpson_integree, errors_trapeze_integree = [], []
+
+    # Listes des temps d'exécution mesurés avec time.perf_counter
 
     times_rectangle_classique, times_rectangle_numpy = [], []
     times_trapeze_classique, times_trapeze_numpy = [], []
@@ -34,6 +66,9 @@ def main():
     # ==========================================================
     # CALCULS
     # ==========================================================
+    # Pour chaque valeur de n, on appelle chaque méthode, on chronomètre et
+    # on stocke l'erreur absolue par rapport à la valeur exacte.
+
 
     for n in n_values:
 
@@ -78,11 +113,13 @@ def main():
         t_trap_int = time.perf_counter() - t0
 
         # Vérifications
+        # Les versions classique et NumPy DOIVENT donner le même résultat ;
+        # rtol=1e-10 tolère de légères différences d'arrondi flottant.
         assert np.isclose(rect_class, rect_np, rtol=1e-10)
         assert np.isclose(trap_class, trap_np, rtol=1e-10)
         assert np.isclose(simp_class, simp_np, rtol=1e-10)
 
-        # Erreurs
+        # --- Stockage des erreurs absolues ---
         errors_rectangle_classique.append(abs(rect_class - exact_integral))
         errors_rectangle_numpy.append(abs(rect_np - exact_integral))
 
@@ -95,7 +132,7 @@ def main():
         errors_simpson_integree.append(abs(simp_int - exact_integral))
         errors_trapeze_integree.append(abs(trap_int - exact_integral))
 
-        # Temps
+        # --- Stockage des temps de calcul ---
         times_rectangle_classique.append(t_rect_class)
         times_rectangle_numpy.append(t_rect_np)
 
@@ -112,17 +149,19 @@ def main():
     # STYLE
     # ==========================================================
 
-    plt.style.use('ggplot')
+    plt.style.use('ggplot') # Thème avec grille et couleurs douces
 
     # ==========================================================
-    # FIGURE 1
+    # FIGURE 1 : convergence, performance et comparaison des erreurs
     # ==========================================================
 
     fig1 = plt.figure(figsize=(12, 14))
 
     # ----------------------------------------------------------
-    # CONVERGENCE
+    # Sous-figure 1 — Convergence (erreur vs n)
     # ----------------------------------------------------------
+    # Graphique log-log : si la méthode converge en O(n^-k), on observe
+    # une droite de pente -k, ce qui permet de vérifier l'ordre théorique.
 
     plt.subplot(3, 1, 1)
 
@@ -146,8 +185,10 @@ def main():
     plt.legend()
 
     # ----------------------------------------------------------
-    # TEMPS
+    # Sous-figure 2 — Temps de calcul (temps vs n)
     # ----------------------------------------------------------
+    # On s'attend à ce que les versions NumPy soient significativement plus
+    # rapides que les boucles Python, surtout pour les grands n.
 
     plt.subplot(3, 1, 2)
 
@@ -171,16 +212,21 @@ def main():
     plt.legend()
 
     # ----------------------------------------------------------
-    # BARRES
+    #  Sous-figure 3 — Comparaison par barres (erreur pour n fixes)
     # ----------------------------------------------------------
-
+    # Permet une lecture directe des erreurs pour 5 valeurs de n représentatives.
+    # L'axe y est en échelle logarithmique pour accommoder les grandes disparités.
     plt.subplot(3, 1, 3)
 
+    # Sélection des indices correspondant aux n d'intérêt
     n_samples = [10, 50, 100, 500, 1000]
     indices = [np.where(n_values == n)[0][0] for n in n_samples]
 
     x_pos = np.arange(len(indices))
-    width = 0.09
+    width = 0.09 # Largeur de chaque barre (8 méthodes × 0.09 ≈ 0.72 < 1)
+
+    
+    # Chaque barre est décalée horizontalement pour éviter les chevauchements
 
     plt.bar(x_pos - 3.5 * width, [errors_rectangle_classique[i] for i in indices], width, label='Rectangle Classique')
     plt.bar(x_pos - 2.5 * width, [errors_rectangle_numpy[i] for i in indices], width, label='Rectangle NumPy')
@@ -194,9 +240,9 @@ def main():
     plt.bar(x_pos + 2.5 * width, [errors_simpson_integree[i] for i in indices], width, label='Simpson Intégrée')
     plt.bar(x_pos + 3.5 * width, [errors_trapeze_integree[i] for i in indices], width, label='Trapèze Intégrée')
 
-    plt.yscale('log')
+    plt.yscale('log') # Axe log pour visualiser les petites erreurs
 
-    plt.xticks(x_pos, [n_values[i] for i in indices])
+    plt.xticks(x_pos, [n_values[i] for i in indices]) # Libellés = valeurs de n
 
     plt.xlabel('Nombre de segments (n)')
     plt.ylabel('Erreur absolue')
@@ -205,9 +251,9 @@ def main():
 
     plt.grid(True, axis='y', ls='--', alpha=0.7)
 
-    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+    plt.legend(bbox_to_anchor=(1.02, 1), loc='upper left')  # Légende hors du graphique
 
-    plt.tight_layout()
+    plt.tight_layout() # Ajustement automatique des marges pour éviter les recoupements
 
     # ==========================================================
     # EXPORT FIGURE 1
@@ -216,8 +262,11 @@ def main():
     fig1.savefig('comparaison_methodes_integration.pdf', format='pdf', bbox_inches='tight')
 
     # ==========================================================
-    # FIGURE 2 : ZOOM SIMPSON
+    # FIGURE 2 : zoom sur la convergence de Simpson
     # ==========================================================
+    # Simpson est exacte (erreur ≈ 0) pour les polynômes de degré ≤ 3 ; cette
+    # figure met en évidence que l'erreur atteint rapidement la précision machine
+    # (epsilon flottant ≈ 2.2e-16) et que la pente log-log est bien -4.
 
     fig2 = plt.figure(figsize=(10, 6))
 
@@ -225,16 +274,21 @@ def main():
     plt.loglog(n_values, errors_simpson_numpy, 's-m', label='Simpson NumPy', linewidth=2, markersize=7)
     plt.loglog(n_values, errors_simpson_integree, '^-', color='darkred', label='Simpson Intégrée', linewidth=2, markersize=7)
 
-    # Pente théorique
+    # Pente théorique : 
+    # Droite de référence de pente -4 (ordre théorique de Simpson) :
+    # on l'ajuste pour qu'elle passe par le premier point de la courbe classique.
     ref = errors_simpson_classique[0] * (n_values[0] ** 4)
     theoretical = ref / (n_values ** 4)
 
     plt.loglog(n_values, theoretical, 'k--', linewidth=2, label='Pente théorique $O(n^{-4})$')
 
-    # Précision machine
+    # Précision machine : 
+    # Ligne horizontale marquant la précision machine (limite fondamentale de la
+    # représentation flottante IEEE 754 double précision ≈ 2.2e-16)
     plt.axhline(y=np.finfo(float).eps, color='red', linestyle=':', linewidth=2, label='Précision machine')
 
-    # Limites axe Y
+    # Limites axe Y : 
+    # Limites de l'axe y adaptées pour voir la zone d'intérêt (convergence + plancher)
     plt.ylim(1e-15, 1e-14)
 
     plt.xlabel('Nombre de segments (n)', fontsize=12)
@@ -264,6 +318,7 @@ def main():
 # ==============================================================
 # EXÉCUTION
 # ==============================================================
-
+# Ce bloc garantit que main() n'est appelé que si ce fichier est exécuté
+# directement (et non importé comme module).
 if __name__ == "__main__":
     main()
