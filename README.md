@@ -31,7 +31,7 @@ Le programme compare différentes approches et évalue la convergence et la vite
 
 * **Méthode des rectangles :** Divise l'intervalle d'intégration en segments réguliers et évalue la fonction au bord gauche de chaque segment. Méthode d'ordre 1.
 * **Méthode des trapèzes :** Approxime l'aire sous la courbe en utilisant des trapèzes sur chaque segment. Méthode d'ordre 2.
-* **Méthode de Simpson :** Combine la méthode des trapèzes et des paraboles pour obtenir une approximation bien plus précise de l'intégrale.
+* **Méthode de Simpson :** Combine la méthode des trapèzes et des paraboles pour obtenir une approximation bien plus précise de l'intégrale, cette méthode est d'ordre 3.
 * **Méthodes pré-programmées :** Comparaison avec les fonctions natives de  `scipy.integrate` (`trapezoid` et `simpson`) qui sert de référence pour valider les implémentations et mesurer l'écart de performance.
 
 ---
