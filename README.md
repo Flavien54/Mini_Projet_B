@@ -82,7 +82,7 @@ pip install numpy scipy matplotlib
 L'execution du script principal suffit pour lancer l'intégralité des calculs, des chronométrages et la génération des graphiques. Ce programme ne nécessite pas de CLI complexe.
 
 **Ce que fait le script :**
-1. Définit les paramètres du polynôme `p = [7, 23, 3e4, 51]` sur l'intervalle `[0, 1]`.
+1. Définit les paramètres du polynôme de degré 3 `p = [7, 23, 3e4, 51]` sur l'intervalle `[0, 1]`.
 2. Calcule la solution analytique exacte.
 3. Teste itérativement chaque méthode pour un nombre `n` de segments allant de 10 à 10 000.
 4. Chronomètre (`time.perf_counter`) et valide les écarts de résultats mathématiques entre les approches.
