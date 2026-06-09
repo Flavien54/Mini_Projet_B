@@ -160,7 +160,7 @@ Aucun argument en ligne de commande n'est nécessaire. Le script exécute automa
 
 ### Rapport
 
-`rapport.pdf` — Rapport de 4 pages maximum couvrant :
+`MGA802_PROJET_B.pdf` — Rapport de 4 pages maximum couvrant :
 - Interprétation des graphiques de convergence et de temps de calcul.
 - Analyse comparative des erreurs absolues par méthode.
 - Discussion sur les limites de précision (erreur machine, saturation de Simpson).
